@@ -15,6 +15,7 @@ import FAQSection from "./HomeComponents/FAQSection";
 import NewsletterSection from "./HomeComponents/NewsletterSection";
 import LatestBlogSection from "./HomeComponents/LatestBlogSection";
 import ContactSection from "./HomeComponents/ContactSection";
+import ProjectsSection from "./HomeComponents/ProjectsSection";
 
 const Home = () => {
   return (
@@ -24,6 +25,7 @@ const Home = () => {
       <HowItWorksSection />
       <ServicesSection />
       <ServicesAreaSection />
+      <ProjectsSection />
       <CallToActionSection />
       <AdvertisingSection />
       <PricingSection />
