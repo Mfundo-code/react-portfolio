@@ -8,9 +8,22 @@ const Footer = () => {
     email: '',
     message: ''
   });
+  const [isMobile, setIsMobile] = useState(false);
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    function checkMobile() {
+      if (typeof window === "undefined") return;
+      setIsMobile(window.innerWidth < 768);
+    }
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const fastLinks = [
     { name: "Home", path: "/" },
@@ -332,6 +345,235 @@ const Footer = () => {
     };
   }, []);
 
+  // Base styles
+  const styles = {
+    container: {
+      background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
+      color: "#1a1a1a",
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+      position: "relative",
+      paddingTop: isMobile ? "120px" : "200px",
+      overflow: "hidden",
+      borderRadius: "24px 24px 0 0",
+      margin: isMobile ? "10px 10px 0 10px" : "20px 20px 0 20px",
+      border: "1px solid rgba(255, 255, 255, 0.9)",
+      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.08)",
+    },
+    canvas: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      opacity: 0.9,
+    },
+    mainContent: {
+      display: "grid",
+      gridTemplateColumns: isMobile ? "1fr" : "30% 1fr",
+      gap: isMobile ? "40px" : "60px",
+      maxWidth: "1200px",
+      margin: "0 auto",
+      padding: isMobile ? "0 20px 40px" : "0 40px 60px",
+      position: "relative",
+      zIndex: 2,
+    },
+    contactSection: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      position: isMobile ? "relative" : "absolute",
+      top: isMobile ? "0" : "-200px",
+      left: isMobile ? "0" : "40px",
+      width: isMobile ? "100%" : "calc(30% - 70px)",
+      maxWidth: isMobile ? "100%" : "380px",
+      zIndex: 10,
+      alignItems: "center",
+    },
+    formSpacer: {
+      minHeight: isMobile ? "0" : "1px",
+      display: isMobile ? "none" : "block",
+    },
+    sectionTitle: {
+      fontSize: isMobile ? "1.1rem" : "1.3rem",
+      fontWeight: "700",
+      margin: "0 0 15px 0",
+      background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+      backgroundClip: "text",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      textAlign: "center",
+      width: "100%",
+    },
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      background: "linear-gradient(135deg, rgba(248, 249, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%)",
+      backdropFilter: "blur(15px)",
+      padding: isMobile ? "20px" : "24px",
+      borderRadius: "20px",
+      boxShadow: "0 20px 60px rgba(99, 102, 241, 0.2), 0 10px 30px rgba(0, 0, 0, 0.15)",
+      border: "1px solid rgba(99, 102, 241, 0.2)",
+      width: "100%",
+    },
+    input: {
+      padding: isMobile ? "10px 12px" : "12px 14px",
+      borderRadius: "10px",
+      border: "1px solid #e1e5e9",
+      backgroundColor: "#ffffff",
+      color: "#333333",
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
+      fontFamily: "inherit",
+      transition: "all 0.3s ease",
+      outline: "none",
+    },
+    textarea: {
+      padding: isMobile ? "10px 12px" : "12px 14px",
+      borderRadius: "10px",
+      border: "1px solid #e1e5e9",
+      backgroundColor: "#ffffff",
+      color: "#333333",
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
+      fontFamily: "inherit",
+      transition: "all 0.3s ease",
+      outline: "none",
+      resize: "vertical",
+      minHeight: "100px",
+    },
+    submitButton: {
+      padding: isMobile ? "10px 20px" : "12px 24px",
+      border: "none",
+      borderRadius: "10px",
+      background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+      color: "#ffffff",
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
+      fontWeight: "700",
+      cursor: "pointer",
+      fontFamily: "inherit",
+      transition: "all 0.3s ease",
+      boxShadow: "0 6px 20px rgba(99, 102, 241, 0.4)",
+      marginTop: "6px",
+    },
+    socialContainer: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "10px",
+    },
+    socialLinks: {
+      display: "flex",
+      gap: "10px",
+      flexWrap: "wrap",
+      justifyContent: "center",
+    },
+    socialLink: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: isMobile ? "36px" : "40px",
+      height: isMobile ? "36px" : "40px",
+      borderRadius: "10px",
+      background: "rgba(99, 102, 241, 0.15)",
+      backdropFilter: "blur(15px)",
+      border: "1px solid rgba(99, 102, 241, 0.25)",
+      color: "#6366f1",
+      textDecoration: "none",
+      transition: "all 0.3s ease",
+    },
+    rightSection: {
+      display: "grid",
+      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+      gap: isMobile ? "40px" : "60px",
+      paddingTop: isMobile ? "0" : "20px",
+    },
+    linksColumn: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    },
+    linksList: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+    },
+    linkButton: {
+      display: "block",
+      padding: "6.5px 16px",
+      background: "rgba(255, 255, 255, 0.85)",
+      backdropFilter: "blur(15px)",
+      borderRadius: "10px",
+      border: "1px solid rgba(99, 102, 241, 0.15)",
+      textDecoration: "none",
+      color: "#1a1a1a",
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+    },
+    linkButtonContent: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+    linkButtonText: {
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
+      fontWeight: "600",
+      color: "#1a1a1a",
+    },
+    linkButtonIcon: {
+      color: "#6366f1",
+      flexShrink: 0,
+    },
+    contactColumn: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    },
+    contactItem: {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "12px",
+      padding: isMobile ? "10px" : "12px",
+      background: "rgba(255, 255, 255, 0.85)",
+      backdropFilter: "blur(15px)",
+      borderRadius: "10px",
+      border: "1px solid rgba(99, 102, 241, 0.15)",
+    },
+    contactIcon: {
+      color: "#6366f1",
+      flexShrink: 0,
+      marginTop: "2px",
+    },
+    contactLabel: {
+      fontSize: isMobile ? "0.7rem" : "0.75rem",
+      color: "rgba(26, 26, 26, 0.6)",
+      margin: "0 0 3px 0",
+    },
+    contactValue: {
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
+      fontWeight: "600",
+      color: "#1a1a1a",
+      textDecoration: "none",
+      transition: "color 0.3s ease",
+    },
+    bottomBar: {
+      borderTop: "4px solid",
+      borderImage: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) 1",
+      background: "rgba(255, 255, 255, 0.9)",
+      backdropFilter: "blur(15px)",
+      padding: isMobile ? "20px" : "25px 40px",
+      textAlign: "center",
+      position: "relative",
+      zIndex: 2,
+    },
+    copyright: {
+      margin: "0",
+      color: "rgba(26, 26, 26, 0.7)",
+      fontSize: isMobile ? "0.8rem" : "0.9rem",
+    },
+  };
+
   return (
     <footer ref={containerRef} style={styles.container}>
       {/* Enhanced Neural Network Animation Background */}
@@ -341,9 +583,9 @@ const Footer = () => {
         aria-hidden="true"
       />
 
-      {/* Main Footer Content - L-shaped layout */}
+      {/* Main Footer Content */}
       <div style={styles.mainContent}>
-        {/* Left Section - Contact Form (Protruding upward) */}
+        {/* Contact Form Section */}
         <motion.div 
           style={styles.contactSection}
           initial={{ opacity: 0, y: 20 }}
@@ -398,7 +640,7 @@ const Footer = () => {
             </motion.button>
           </div>
 
-          {/* Social Links - Centered under Form */}
+          {/* Social Links */}
           <div style={styles.socialContainer}>
             <div style={styles.socialLinks}>
               {socialLinks.map((social, index) => (
@@ -422,10 +664,10 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* Spacer for form column */}
+        {/* Spacer for desktop layout */}
         <div style={styles.formSpacer}></div>
 
-        {/* Right Section - Two Columns */}
+        {/* Right Section - Links and Contact Info */}
         <motion.div 
           style={styles.rightSection}
           initial={{ opacity: 0, y: 20 }}
@@ -525,234 +767,6 @@ const Footer = () => {
       </motion.div>
     </footer>
   );
-};
-
-const styles = {
-  container: {
-    background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
-    color: "#1a1a1a",
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-    position: "relative",
-    paddingTop: "200px",
-    overflow: "hidden",
-    borderRadius: "24px 24px 0 0",
-    margin: "20px 20px 0 20px",
-    border: "1px solid rgba(255, 255, 255, 0.9)",
-    boxShadow: "0 25px 50px rgba(0, 0, 0, 0.08)",
-  },
-  canvas: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none',
-    opacity: 0.9, // Much higher opacity
-  },
-  mainContent: {
-    display: "grid",
-    gridTemplateColumns: "30% 1fr",
-    gap: "60px",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "0 40px 60px",
-    position: "relative",
-    zIndex: 2,
-  },
-  contactSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    position: "absolute",
-    top: "-200px",
-    left: "40px",
-    width: "calc(30% - 70px)",
-    maxWidth: "380px",
-    zIndex: 10,
-    alignItems: "center",
-  },
-  formSpacer: {
-    minHeight: "1px",
-  },
-  sectionTitle: {
-    fontSize: "1.3rem",
-    fontWeight: "700",
-    margin: "0 0 15px 0",
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    backgroundClip: "text",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textAlign: "center",
-    width: "100%",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    background: "linear-gradient(135deg, rgba(248, 249, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%)",
-    backdropFilter: "blur(15px)",
-    padding: "24px",
-    borderRadius: "20px",
-    boxShadow: "0 20px 60px rgba(99, 102, 241, 0.2), 0 10px 30px rgba(0, 0, 0, 0.15)",
-    border: "1px solid rgba(99, 102, 241, 0.2)",
-    width: "100%",
-  },
-  input: {
-    padding: "12px 14px",
-    borderRadius: "10px",
-    border: "1px solid #e1e5e9",
-    backgroundColor: "#ffffff",
-    color: "#333333",
-    fontSize: "0.9rem",
-    fontFamily: "inherit",
-    transition: "all 0.3s ease",
-    outline: "none",
-  },
-  textarea: {
-    padding: "12px 14px",
-    borderRadius: "10px",
-    border: "1px solid #e1e5e9",
-    backgroundColor: "#ffffff",
-    color: "#333333",
-    fontSize: "0.9rem",
-    fontFamily: "inherit",
-    transition: "all 0.3s ease",
-    outline: "none",
-    resize: "vertical",
-    minHeight: "100px",
-  },
-  submitButton: {
-    padding: "12px 24px",
-    border: "none",
-    borderRadius: "10px",
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    color: "#ffffff",
-    fontSize: "0.9rem",
-    fontWeight: "700",
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transition: "all 0.3s ease",
-    boxShadow: "0 6px 20px rgba(99, 102, 241, 0.4)",
-    marginTop: "6px",
-  },
-  socialContainer: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "10px",
-  },
-  socialLinks: {
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  socialLink: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "40px",
-    height: "40px",
-    borderRadius: "10px",
-    background: "rgba(99, 102, 241, 0.15)",
-    backdropFilter: "blur(15px)",
-    border: "1px solid rgba(99, 102, 241, 0.25)",
-    color: "#6366f1",
-    textDecoration: "none",
-    transition: "all 0.3s ease",
-  },
-  rightSection: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "60px",
-    paddingTop: "20px",
-  },
-  linksColumn: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  },
-  linksList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-  // New styles for button-style quick links
-  linkButton: {
-    display: "block",
-    padding: "6.5px 16px",
-    background: "rgba(255, 255, 255, 0.85)",
-    backdropFilter: "blur(15px)",
-    borderRadius: "10px",
-    border: "1px solid rgba(99, 102, 241, 0.15)",
-    textDecoration: "none",
-    color: "#1a1a1a",
-    transition: "all 0.3s ease",
-    cursor: "pointer",
-  },
-  linkButtonContent: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  linkButtonText: {
-    fontSize: "0.9rem",
-    fontWeight: "600",
-    color: "#1a1a1a",
-  },
-  linkButtonIcon: {
-    color: "#6366f1",
-    flexShrink: 0,
-  },
-  contactColumn: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  },
-  contactItem: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "12px",
-    padding: "12px",
-    background: "rgba(255, 255, 255, 0.85)",
-    backdropFilter: "blur(15px)",
-    borderRadius: "10px",
-    border: "1px solid rgba(99, 102, 241, 0.15)",
-  },
-  contactIcon: {
-    color: "#6366f1",
-    flexShrink: 0,
-    marginTop: "2px",
-  },
-  contactLabel: {
-    fontSize: "0.75rem",
-    color: "rgba(26, 26, 26, 0.6)",
-    margin: "0 0 3px 0",
-  },
-  contactValue: {
-    fontSize: "0.9rem",
-    fontWeight: "600",
-    color: "#1a1a1a",
-    textDecoration: "none",
-    transition: "color 0.3s ease",
-  },
-  bottomBar: {
-    borderTop: "4px solid",
-    borderImage: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) 1",
-    background: "rgba(255, 255, 255, 0.9)",
-    backdropFilter: "blur(15px)",
-    padding: "25px 40px",
-    textAlign: "center",
-    position: "relative",
-    zIndex: 2,
-  },
-  copyright: {
-    margin: "0",
-    color: "rgba(26, 26, 26, 0.7)",
-    fontSize: "0.9rem",
-  },
 };
 
 export default Footer;

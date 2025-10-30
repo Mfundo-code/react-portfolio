@@ -3,13 +3,13 @@ import { Routes, Route } from "react-router-dom";
 import Header from "./GlobalComponents/Header";
 import Footer from "./GlobalComponents/Footer";
 import ScrollToTop from "./GlobalComponents/ScrollToTop"; 
-
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Blog from "./pages/Blog/Blog";
 import Projects from "./pages/Projects/Projects";
 import Services from "./pages/Services/Services";
 import Contacts from "./pages/Contacts/Contacts";
+import FloatingButtons from "./GlobalComponents/FloatingButtons";
 
 function App() {
   return (
@@ -27,6 +27,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      <FloatingButtons />
     </div>
   );
 }
