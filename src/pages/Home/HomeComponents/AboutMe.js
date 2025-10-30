@@ -435,7 +435,7 @@ export default function AboutMe() {
 
 const styles = {
   section: {
-    padding: '80px 20px',
+    padding: '40px 20px', // Reduced from 80px 20px
     background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
     position: 'relative',
     overflow: 'hidden',
@@ -444,6 +444,7 @@ const styles = {
     margin: '20px',
     border: '1px solid rgba(255, 255, 255, 0.9)',
     boxShadow: '0 25px 50px rgba(0, 0, 0, 0.08)',
+    minHeight: '400px', // Added minimum height
   },
   canvas: {
     position: 'absolute',
@@ -462,7 +463,7 @@ const styles = {
   },
   content: {
     display: 'flex',
-    gap: '60px',
+    gap: '40px', // Reduced from 60px
     alignItems: 'flex-start',
     flexWrap: 'wrap',
   },
@@ -479,10 +480,10 @@ const styles = {
     alignItems: 'center',
   },
   title: {
-    fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+    fontSize: 'clamp(2rem, 4vw, 3rem)', // Slightly reduced font sizes
     fontWeight: 800,
     color: '#1e293b',
-    margin: '0 0 24px 0',
+    margin: '0 0 16px 0', // Reduced margin
     lineHeight: 1.1,
     background: 'linear-gradient(135deg, #1e293b 0%, #475569 50%, #6366f1 100%)',
     backgroundClip: 'text',
@@ -491,40 +492,40 @@ const styles = {
     textShadow: '0 4px 30px rgba(99, 102, 241, 0.1)',
   },
   description: {
-    fontSize: '1.2rem',
-    lineHeight: 1.7,
+    fontSize: '1.1rem', // Slightly reduced
+    lineHeight: 1.6, // Slightly reduced
     color: '#475569',
-    margin: '0 0 32px 0',
+    margin: '0 0 24px 0', // Reduced margin
     fontWeight: 400,
     background: 'rgba(255, 255, 255, 0.7)',
     backdropFilter: 'blur(10px)',
-    padding: '20px',
+    padding: '16px', // Reduced padding
     borderRadius: '12px',
     border: '1px solid rgba(255, 255, 255, 0.8)',
   },
   availabilitySection: {
-    marginTop: '32px',
-    marginBottom: '28px',
+    marginTop: '24px', // Reduced
+    marginBottom: '20px', // Reduced
   },
   availabilityTitle: {
-    fontSize: '1.2rem',
+    fontSize: '1.1rem', // Slightly reduced
     fontWeight: 700,
     color: '#334155',
-    margin: '0 0 16px 0',
+    margin: '0 0 12px 0', // Reduced margin
     textAlign: 'center',
   },
   availabilityTags: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '12px',
+    gap: '10px', // Reduced gap
     justifyContent: 'center',
   },
   availabilityTag: {
     background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
     color: 'white',
-    padding: '12px 20px',
-    borderRadius: '25px',
-    fontSize: '0.95rem',
+    padding: '10px 16px', // Reduced padding
+    borderRadius: '20px', // Slightly reduced
+    fontSize: '0.9rem', // Slightly reduced
     fontWeight: 600,
     boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
     cursor: 'default',
@@ -538,28 +539,28 @@ const styles = {
     background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
     color: 'white',
     border: 'none',
-    padding: '16px 32px',
-    borderRadius: '14px',
-    fontSize: '1.1rem',
+    padding: '14px 28px', // Reduced padding
+    borderRadius: '12px', // Slightly reduced
+    fontSize: '1rem', // Slightly reduced
     fontWeight: 700,
     cursor: 'pointer',
     boxShadow: '0 6px 20px rgba(99, 102, 241, 0.3)',
     transition: 'all 0.3s ease',
     fontFamily: 'inherit',
     width: '100%',
-    maxWidth: '280px',
+    maxWidth: '260px', // Slightly reduced
   },
   statsGrid: {
     display: 'grid',
-    gap: '24px',
+    gap: '20px', // Reduced gap
     width: '100%',
-    maxWidth: '400px',
+    maxWidth: '380px', // Slightly reduced
   },
   statCard: {
     background: 'rgba(255, 255, 255, 0.85)',
     backdropFilter: 'blur(15px)',
-    padding: '32px 24px',
-    borderRadius: '20px',
+    padding: '24px 20px', // Reduced padding
+    borderRadius: '16px', // Slightly reduced
     textAlign: 'center',
     border: '1px solid rgba(255, 255, 255, 0.9)',
     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
@@ -569,15 +570,15 @@ const styles = {
     perspective: '1000px',
   },
   statNumber: {
-    fontSize: '3rem',
+    fontSize: '2.5rem', // Reduced from 3rem
     fontWeight: 900,
     color: '#6366f1',
-    margin: '0 0 8px 0',
+    margin: '0 0 6px 0', // Reduced margin
     lineHeight: 1,
     textShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
   },
   statLabel: {
-    fontSize: '1.1rem',
+    fontSize: '1rem', // Slightly reduced
     color: '#64748b',
     fontWeight: 600,
   },
@@ -587,6 +588,6 @@ const styles = {
     left: 0,
     height: '3px',
     background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
-    borderRadius: '0 0 20px 20px',
+    borderRadius: '0 0 16px 16px', // Adjusted to match reduced border radius
   },
 };

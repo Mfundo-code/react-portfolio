@@ -122,7 +122,7 @@ const ProjectsSection = () => {
   }
 
   const currentCategory = categories[currentCategoryIndex];
-  const projectsToShow = currentCategory?.projects?.slice(0, 4) || [];
+  const projectsToShow = currentCategory?.projects?.slice(0, 3) || [];
 
   return (
     <section style={styles.section} aria-labelledby="projects-heading">
@@ -136,15 +136,6 @@ const ProjectsSection = () => {
         >
           Featured Projects
         </motion.h2>
-
-        <motion.p 
-          style={styles.subtitle}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          Explore my work across different technologies and domains
-        </motion.p>
 
         {/* Category Navigation */}
         <div style={styles.categoryNav}>
@@ -340,10 +331,10 @@ const ProjectsSection = () => {
 
 const styles = {
   section: {
-    padding: '80px 20px',
+    padding: '10px 2px',
     background: '#ffffff',
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    minHeight: '100vh',
+    minHeight: 'auto',
   },
   container: {
     maxWidth: 1200,
@@ -404,7 +395,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '20px',
-    marginBottom: '40px',
+    marginBottom: '10px', // Reduced from 40px
   },
   navButton: {
     width: '50px',
@@ -564,7 +555,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     gap: '8px',
-    marginTop: '20px',
+    marginTop: '5px', // Reduced from 20px
   },
   indicator: {
     width: '12px',
@@ -584,7 +575,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '80px 20px',
+    padding: '20px 10px',
     color: '#4a5568',
   },
   spinner: {
@@ -602,7 +593,7 @@ const styles = {
   },
   errorContainer: {
     textAlign: 'center',
-    padding: '80px 20px',
+    padding: '40px 20px',
     color: '#4a5568',
     maxWidth: 600,
     margin: '0 auto',
@@ -643,7 +634,7 @@ const styles = {
   },
   emptyContainer: {
     textAlign: 'center',
-    padding: '80px 20px',
+    padding: '40px 20px',
     color: '#4a5568',
   },
   emptyTitle: {
@@ -667,6 +658,3 @@ spinnerStyle.textContent = `
 document.head.appendChild(spinnerStyle);
 
 export default ProjectsSection;
-
-
-
