@@ -14,25 +14,25 @@ export default function TechSkills() {
       color: "#6366f1",
       skills: [
         {
-          name: "React & Next.js",
+          name: "Frontend",
           level: 92,
-          description: "Building modern, scalable web applications with React, Next.js, and TypeScript",
+          description: "Building modern, scalable web applications with React, Vue, and TypeScript",
           projects: ["mfundodev.com Portfolio", "E-commerce Platforms", "Admin Dashboards"],
-          tools: ["Next.js 14", "TypeScript", "Tailwind CSS", "React Query"]
+          tools: ["Vue", "TypeScript", "Tailwind CSS", "React"]
         },
         {
-          name: "Node.js & Backend",
+          name: "Backend",
           level: 88,
           description: "RESTful APIs, server-side rendering, and database management",
           projects: ["Custom APIs", "Authentication Systems", "Real-time Features"],
-          tools: ["Express.js", "MongoDB", "PostgreSQL", "JWT Auth"]
+          tools: [".NET", "Django", "SQLs", "Rest Framework"]
         },
         {
-          name: "State Management",
+          name: "Database Management",
           level: 90,
-          description: "Complex state handling across client and server components",
-          projects: ["Global State Solutions", "Form Management", "Caching Strategies"],
-          tools: ["Redux Toolkit", "Zustand", "React Context", "SWR"]
+          description: "Worked on databases to store, organize and manage data using sql commands",
+          projects: ["Design Tables and connect databases", "Handling user data and logins",],
+          tools: ["My SQL", "PostgreSQL", "SQLite", "NoSQL databases"]
         }
       ]
     },
@@ -49,18 +49,18 @@ export default function TechSkills() {
           tools: ["React Native CLI", "Expo", "Native Wind", "React Navigation"]
         },
         {
-          name: "Kotlin & Android",
-          level: 82,
-          description: "Native Android development with modern Kotlin and Jetpack Compose",
-          projects: ["Performance-focused Apps", "Hardware Integration", "Custom UI"],
-          tools: ["Kotlin", "Jetpack Compose", "Android Studio", "Coroutines"]
+          name: "Kotlin & Swift",
+          level: 60,
+          description: "Cross-platform mobile apps with reactt native. I use swift and kolten mainly for native configuration and intergration when needed. Or on heavy apps",
+          projects: ["Performance-focused Apps", "Handling system permitions"],
+          tools: ["Kotlin", "Swift", "Android Studio", "Gradle"]
         },
         {
           name: "Mobile Debugging",
           level: 85,
           description: "Advanced debugging, performance optimization, and crash analytics",
           projects: ["Memory Optimization", "Performance Tuning", "Crash Reporting"],
-          tools: ["React Native Debugger", "Android Profiler", "Sentry", "Flipper"]
+          tools: ["React Native Debugger", "SDK tools"]
         }
       ]
     },
@@ -73,22 +73,22 @@ export default function TechSkills() {
           name: "VPS Management",
           level: 87,
           description: "Full server setup, maintenance, and optimization on Contabo VPS",
-          projects: ["mfundodev.com Deployment", "Server Security", "Resource Optimization"],
+          projects: ["Wabsites Deployment", "Server Security", "Hosting Domian For mailcow"],
           tools: ["Ubuntu 22.04", "SSH", "Systemd", "Firewall Configuration"]
         },
         {
           name: "Nginx & Reverse Proxy",
           level: 85,
           description: "Web server configuration, SSL termination, and load balancing",
-          projects: ["Domain Routing", "SSL Setup", "Performance Tuning"],
-          tools: ["Nginx", "SSL Certificates", "Reverse Proxy", "Load Balancing"]
+          projects: ["Domain Routing", "SSL Setup"],
+          tools: ["Nginx", "SSL Certificates", "Reverse Proxy"]
         },
         {
           name: "DNS & Domain Management",
           level: 90,
           description: "Complete DNS configuration and domain management for multiple services",
-          projects: ["mfundodev.com DNS", "Subdomain Setup", "Email Records"],
-          tools: ["Cloudflare", "Namecheap", "DNS Records", "CDN Configuration"]
+          projects: ["DNS set up", "Domain Setup", "Email Records"],
+          tools: ["DNS adress", "DNS Records", "DNS Configuration"]
         }
       ]
     },
@@ -102,7 +102,7 @@ export default function TechSkills() {
           level: 84,
           description: "Self-hosted professional email with Mailcow and proper security",
           projects: ["mail.mfundodev.com", "Professional Email", "Spam Protection"],
-          tools: ["Mailcow", "Docker", "Postfix", "Dovecot"]
+          tools: ["Mailcow", "Mail Hosting Setvices"]
         },
         {
           name: "Email Security",
@@ -116,7 +116,7 @@ export default function TechSkills() {
           level: 86,
           description: "SSL certificate management and server security hardening",
           projects: ["HTTPS Enforcement", "Security Headers", "Vulnerability Scanning"],
-          tools: ["Let's Encrypt", "Certbot", "Security Headers", "SSL Labs"]
+          tools: ["Let's Encrypt", "Certbot", "SSL Labs"]
         }
       ]
     },
@@ -130,7 +130,7 @@ export default function TechSkills() {
           level: 85,
           description: "Beautiful interfaces with smooth animations and micro-interactions",
           projects: ["Interactive UIs", "Animated Components", "User Experience"],
-          tools: ["Framer Motion", "CSS Animations", "Canvas API", "Lottie"]
+          tools: ["Framer Motion", "CSS Animations", "Canvas API",]
         },
         {
           name: "Design & Prototyping",
@@ -144,7 +144,7 @@ export default function TechSkills() {
           level: 90,
           description: "Comprehensive development environment and workflow optimization",
           projects: ["CI/CD Setup", "Development Workflow", "Code Quality"],
-          tools: ["Git", "VS Code", "Docker", "ESLint/Prettier"]
+          tools: ["Git", "VS Code"]
         }
       ]
     }

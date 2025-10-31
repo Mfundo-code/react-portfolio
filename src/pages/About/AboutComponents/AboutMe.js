@@ -33,23 +33,17 @@ export default function AboutMe() {
   const hostingPlatforms = ["AWS Amplify", "PythonAnywhere", "Contabo"];
 
   const featuredProjects = [
+  
     {
-      name: "FindTaxi (Santaco South Africa)",
-      href: "https://www.findtexi.com",
+      name: "Mobile Apps",
       summary:
-        "Comprehensive mobile app connecting taxi drivers & passengers — parcel delivery with tracking codes, in-app messaging & voice, real-time location tracking and route optimization."
+        "Cross-platform mobile apps. Used react native, swift and koltin"
     },
     {
-      name: "TeamKonekt (Boutique)",
-      href: "https://www.teamkonekt.com",
+      name: "Websites",
+
       summary:
-        "Internal communications & management platform — issue reporting with status tracking, task management and anonymous suggestions."
-    },
-    {
-      name: "Client Websites (selected)",
-      href: "https://www.manzilconsulting.co.za",
-      summary:
-        "Examples of deployed client websites — Manzil Consulting, Bothakga Bjamahlako, Skill Hive (links in portfolio)."
+        "Websites, I have mantained dns, seo and domains"
     }
   ];
 
@@ -310,7 +304,7 @@ export default function AboutMe() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
             >
-              I'm Mfundo — a freelance full-stack developer building modern web, mobile and desktop solutions.
+              I'm a full-stack developer building modern web, mobile and desktop solutions.
               I deliver production-ready apps using JavaScript (React, React Native), Python Django, and C#/.NET.
               I've worked with 15+ clients and delivered 10+ projects across platforms — focusing on maintainability,
               clean APIs, and user-centered design.
@@ -373,14 +367,6 @@ export default function AboutMe() {
 
             {/* CTA Buttons */}
             <div style={{ display: 'flex', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
-              <a
-                href="https://www.mfundodev.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.ctaPrimary}
-              >
-                View Full Portfolio
-              </a>
 
               <a
                 href="mailto:mfundoknox@gmail.com"
