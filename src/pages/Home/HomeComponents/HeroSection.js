@@ -5,19 +5,16 @@ import about from "../../../assets/images/about.png";
 
 export default function HeroSection({
   imageUrl = about,
-  title = "Hi — I'm Your Name",
-  subtitle = "I design and build scalable web & mobile apps. I like clean code, good UX and fast coffee.",
-  primaryLabel = "View Portfolio",
-  secondaryLabel = "Contact Me",
+  title = "Mfundo Dlamini",
+  subtitle = "Full-Stack Developer | Building Modern Web, Mobile Application and Custom Software Solutions",
+  primaryLabel = "View My Projects",
   onPrimary = () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }),
-  onSecondary = () => (window.location.href = "mailto:you@example.com"),
 }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
 
   const [primaryHover, setPrimaryHover] = useState(false);
-  const [secondaryHover, setSecondaryHover] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
@@ -289,7 +286,7 @@ export default function HeroSection({
       width: "100%",
       height: "100%",
       objectFit: "cover",
-      objectPosition: "center 5%", // Changed from "center 70%" to "center 30%" to push image up
+      objectPosition: "center 5%",
       display: "block",
       transform: imageLoaded ? "scale(1.05)" : "scale(1)",
       filter: imageLoaded ? "grayscale(0.3) contrast(1.1)" : "grayscale(1) contrast(1)",
@@ -307,6 +304,11 @@ export default function HeroSection({
     right: {
       flex: "1 1 500px",
       minWidth: 300,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      textAlign: "center",
+      justifyContent: "center",
     },
     title: {
       fontSize: "clamp(2.5rem, 5vw, 4rem)",
@@ -336,6 +338,7 @@ export default function HeroSection({
       gap: 16,
       alignItems: "center",
       flexWrap: "wrap",
+      justifyContent: "center",
     },
     primaryBtn: (hover) => ({
       cursor: "pointer",
@@ -357,23 +360,6 @@ export default function HeroSection({
         : "0 8px 30px rgba(100, 255, 218, 0.3), 0 0 0 1px rgba(100, 255, 218, 0.05)",
       position: "relative",
       overflow: "hidden",
-    }),
-    secondaryBtn: (hover) => ({
-      cursor: "pointer",
-      userSelect: "none",
-      borderRadius: 16,
-      padding: "14px 30px",
-      fontWeight: 600,
-      fontSize: "1rem",
-      background: hover ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
-      color: hover ? "#ffffff" : "rgba(240, 246, 255, 0.9)",
-      border: "1px solid rgba(255,255,255,0.15)",
-      backdropFilter: "blur(10px)",
-      transform: hover ? "translateY(-2px)" : "translateY(0)",
-      transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
-      boxShadow: hover 
-        ? "0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)"
-        : "0 8px 30px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05)",
     }),
     tip: {
       marginTop: 20,
@@ -414,7 +400,7 @@ export default function HeroSection({
           </div>
         </div>
 
-        {/* RIGHT text + buttons */}
+        {/* RIGHT text + buttons - CENTERED CONTENT */}
         <div style={styles.right}>
           <h1 id="hero-heading" style={styles.title}>
             {title}
@@ -433,19 +419,6 @@ export default function HeroSection({
               aria-label={primaryLabel}
             >
               {primaryLabel}
-            </div>
-
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onSecondary}
-              onKeyDown={(e) => e.key === "Enter" && onSecondary()}
-              onMouseEnter={() => setSecondaryHover(true)}
-              onMouseLeave={() => setSecondaryHover(false)}
-              style={styles.secondaryBtn(secondaryHover)}
-              aria-label={secondaryLabel}
-            >
-              {secondaryLabel}
             </div>
           </div>
 

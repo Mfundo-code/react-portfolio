@@ -8,6 +8,7 @@ import {
   FaEnvelope,
   FaProjectDiagram,
   FaServicestack,
+  FaUser,
 } from "react-icons/fa";
 import LogoB from "../assets/images/LogoB.png";
 
@@ -145,7 +146,7 @@ const Header = ({ cartCount = 0 }) => {
                 style={styles.mobileMenuItem}
                 onClick={toggleMobileMenu}
               >
-                About
+                <FaUser style={styles.mobileIcon} /> About
               </Link>
 
               <Link
