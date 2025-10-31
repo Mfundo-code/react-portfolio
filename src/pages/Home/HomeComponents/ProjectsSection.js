@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion';
  * - Auto-rotates through categories every 5s
  * - Special handling for "mobile" categories: taller container + objectFit: 'contain'
  * - "More..." button for featured projects (blinking). Clicking opens modal with full info including description.
+ *
+ * Fixes applied: improved centering and sizing logic for mobile screenshots so that
+ * mobile-app project images stay centered inside the card across viewport sizes.
  */
 
 const ProjectsSection = () => {
@@ -264,20 +267,30 @@ const ProjectsSection = () => {
                       height: isMobileCategory ? 360 : styles.imageContainer.height,
                       background: isMobileCategory ? '#ffffff' : styles.imageContainer.background,
                       padding: isMobileCategory ? 12 : 0,
+
+                      // ensure centering for any viewport: use flex + boxSizing
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      boxSizing: 'border-box',
+                      textAlign: 'center',
                     };
 
+                    // For mobile screenshots we want the image to never overflow and always be centered.
+                    // Use maxWidth and maxHeight paired with objectFit: 'contain'. Use width:auto to preserve aspect ratio.
                     const dynamicImgStyle = {
                       ...styles.projectImage,
                       objectFit: isMobileCategory ? 'contain' : 'cover',
-                      height: '100%',
+
+                      // ensure image stays inside the padded container and is horizontally centered
+                      maxWidth: isMobileCategory ? 'calc(100% - 24px)' : '100%',
+                      maxHeight: isMobileCategory ? 336 : '100%',
                       width: isMobileCategory ? 'auto' : '100%',
-                      maxWidth: '100%',
-                      maxHeight: '100%',
+                      height: isMobileCategory ? '100%' : '100%',
                       display: 'block',
-                      margin: '0 auto',
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                      boxSizing: 'border-box',
                       background: isMobileCategory ? '#ffffff' : 'transparent'
                     };
 
@@ -296,7 +309,7 @@ const ProjectsSection = () => {
                               src={getImageUrl(project.project_image)}
                               alt={project.description || project.title || 'Project image'}
                               style={dynamicImgStyle}
-                              onError={(e) => { e.target.style.display = 'none'; }}
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
                               loading="lazy"
                             />
                           ) : (
@@ -332,7 +345,7 @@ const ProjectsSection = () => {
 
                         <div style={styles.projectContent}>
                           <h4 style={styles.projectName}>{project.title || 'Untitled Project'}</h4>
-                          
+
                           {/* Tools Preview - Only show tools, no description */}
                           <div style={styles.toolsContainer}>
                             {tools.slice(0, 3).map((tool, toolIndex) => (
@@ -429,7 +442,7 @@ const ProjectsSection = () => {
                         ...styles.modalImage,
                         objectFit: isMobileCategory ? 'contain' : 'cover'
                       }}
-                      onError={(e) => { e.target.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 )}
@@ -899,20 +912,6 @@ const styles = {
     border: '1px solid #e2e8f0',
     fontWeight: 500,
   },
-};
-
-// Add hover effects
-styles.modalClose[':hover'] = {
-  color: '#1a202c',
-};
-
-styles.modalLink[':hover'] = {
-  transform: 'translateY(-2px)',
-  boxShadow: '0 4px 12px rgba(49, 130, 206, 0.4)',
-};
-
-styles.blinkMoreButton[':hover'] = {
-  transform: 'scale(1.05)',
 };
 
 export default ProjectsSection;

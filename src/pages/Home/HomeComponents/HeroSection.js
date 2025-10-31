@@ -422,7 +422,7 @@ export default function HeroSection({
             </div>
           </div>
 
-          <div style={styles.tip}>// Built with React & modern web technologies</div>
+          <div style={styles.tip}>I am a perfect fit for your team or project</div>
         </div>
       </div>
     </section>

@@ -1,370 +1,286 @@
 // src/GlobalComponents/Header.js
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {
-  FaBars,
-  FaTimes,
-  FaHome,
-  FaEnvelope,
-  FaProjectDiagram,
-  FaServicestack,
-  FaUser,
-} from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
+import { FaBars, FaTimes, FaEnvelope, FaHome, FaUser, FaProjectDiagram, FaServicestack } from "react-icons/fa";
 import LogoB from "../assets/images/LogoB.png";
 
-const Header = ({ cartCount = 0 }) => {
+export default function Header({ cartCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
 
-  const toggleMobileMenu = () => setMobileMenuOpen((s) => !s);
+  const toggleMobileMenu = () => setMobileMenuOpen(s => !s);
 
-  // Scroll to footer function
   const scrollToFooter = () => {
     const footer = document.querySelector('footer');
-    if (footer) {
-      footer.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-    // Close mobile menu if open
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
+    if (footer) footer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (mobileMenuOpen) setMobileMenuOpen(false);
   };
 
-  // Handle logo click - scroll to top or navigate home
   const handleLogoClick = () => {
-    // If we're not on home page, navigate to home
-    if (window.location.pathname !== '/') {
+    if (location.pathname !== '/') {
       window.location.href = '/';
     } else {
-      // If already on home page, scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   useEffect(() => {
-    const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
+    const checkIfMobile = () => setIsMobile(window.innerWidth <= 880);
     checkIfMobile();
-    window.addEventListener("resize", checkIfMobile);
-    return () => window.removeEventListener("resize", checkIfMobile);
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
+  // Theme colors matching hero
+  const ACCENT_A = '#00c9ff';
+  const ACCENT_B = '#64ffda';
+
+  // Base styles
+  const filledStyle = {
+    background: `linear-gradient(90deg, ${ACCENT_B}, ${ACCENT_A})`,
+    color: '#071127',
+    border: 'none',
+    boxShadow: '0 10px 30px rgba(100,255,218,0.12)',
+  };
+  const transparentStyle = {
+    background: 'transparent',
+    color: '#dff7fb',
+    border: `1px solid rgba(100,255,218,0.07)`,
+    boxShadow: 'none',
+  };
+
+  // Slightly-dimmed variant for active state: almost same as filled but softer
+  const activeSoftFilled = {
+    background: `linear-gradient(90deg, ${ACCENT_B}, ${ACCENT_A})`,
+    color: '#071127',
+    border: 'none',
+    boxShadow: '0 6px 18px rgba(100,255,218,0.08)', // softer shadow
+    filter: 'brightness(0.95)', // tiny dim
+    transform: 'translateY(0)', // keep stable
+  };
+
+  const styles = {
+    header: {
+      position: 'sticky',
+      top: 0,
+      zIndex: 120,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 16,
+      padding: '10px 20px',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+      background: 'transparent',
+      borderBottom: 'none',
+      boxShadow: '0 6px 30px rgba(2,8,23,0.6)',
+      alignSelf: 'stretch',
+      minHeight: 64,
+      fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    },
+    logoContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      cursor: 'pointer',
+    },
+    logoImage: {
+      height: 44,
+      width: 'auto',
+      display: 'block',
+      filter: 'drop-shadow(0 6px 18px rgba(0, 201, 255, 0.06))',
+    },
+    nav: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      flex: '1 1 auto',
+      justifyContent: 'center',
+    },
+    // navButton: non-active -> filled; active -> soft filled (only slightly different)
+    navButton: (isActive) => ({
+      textDecoration: 'none',
+      padding: '10px 18px',
+      borderRadius: 999,
+      fontWeight: 600,
+      fontSize: 15,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 8,
+      transition: 'all 180ms cubic-bezier(.2,.9,.3,1)',
+      ...(isActive ? activeSoftFilled : filledStyle),
+    }),
+    rightControls: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      flex: '0 0 auto',
+    },
+    // Icon button: default filled look, toggled (e.g., menu open) gets slightly different (soft) filled
+    iconButton: (toggled = false) => ({
+      padding: 10,
+      borderRadius: 12,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      minWidth: 44,
+      minHeight: 44,
+      transition: 'transform 160ms ease, box-shadow 160ms ease, filter 160ms ease',
+      ...(toggled ? activeSoftFilled : {
+        ...filledStyle,
+      }),
+    }),
+    envelopeIcon: {
+      fontSize: 18,
+      color: '#071127', // keep readable over the filled button
+    },
+    cartBadge: {
+      position: 'absolute',
+      top: -6,
+      right: -6,
+      background: ACCENT_B,
+      color: '#00121a',
+      borderRadius: 99,
+      width: 20,
+      height: 20,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: 12,
+      fontWeight: 700,
+      boxShadow: '0 6px 18px rgba(100,255,218,0.12)'
+    },
+
+    // Mobile
+    mobileNav: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+    },
+    mobileMenuOverlay: {
+      position: 'fixed',
+      inset: 0,
+      background: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(2,6,12,0.6))',
+      zIndex: 200,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      transition: 'opacity 180ms ease',
+    },
+    mobileMenu: {
+      width: 300,
+      height: '100%',
+      background: 'linear-gradient(180deg, rgba(10,14,22,0.95), rgba(6,8,12,0.95))',
+      padding: 20,
+      boxShadow: '-20px 0 60px rgba(2,8,23,0.6)'
+    },
+    // mobileMenuItem: active -> soft filled; else -> filled (same subtle difference as desktop)
+    mobileMenuItem: (isActive) => ({
+      display: 'flex',
+      gap: 12,
+      alignItems: 'center',
+      padding: '12px 14px',
+      textDecoration: 'none',
+      borderRadius: 10,
+      fontWeight: 600,
+      ...(isActive ? activeSoftFilled : { ...filledStyle, color: '#071127' }),
+    }),
+    mobileIcon: { fontSize: 18, color: ACCENT_B },
+  };
+
+  const links = [
+    { to: '/', label: 'Home', icon: <FaHome /> },
+    { to: '/about', label: 'About', icon: <FaUser /> },
+    { to: '/services', label: 'Services', icon: <FaServicestack /> },
+    { to: '/projects', label: 'Projects', icon: <FaProjectDiagram /> },
+  ];
+
   return (
-    <header style={styles.header}>
-      <div style={styles.logoContainer}>
-        <img
-          src={LogoB}
-          alt="Mahlaku Apparel Logo"
-          style={styles.logoImage}
-          onClick={handleLogoClick}
-        />
+    <header style={styles.header} aria-label="Primary header">
+      <div style={styles.logoContainer} onClick={handleLogoClick} role="button" tabIndex={0} aria-label="Go to home">
+        <img src={LogoB} alt="Logo" style={styles.logoImage} />
       </div>
 
-      {/* Desktop Navigation */}
+      {/* Desktop nav */}
       {!isMobile && (
-        <nav style={styles.nav} aria-label="Primary">
-          <Link to="/" style={styles.navButton}>
-            Home
-          </Link>
-
-          <Link to="/about" style={styles.navButton}>
-            About
-          </Link>
-
-          <Link to="/services" style={styles.navButton}>
-            Services
-          </Link>
-
-          <Link to="/projects" style={styles.navButton}>
-            Projects
-          </Link>
-
-          <button
-            type="button"
-            style={styles.iconButton}
-            onClick={scrollToFooter}
-            aria-label="Contact"
-          >
-            <FaEnvelope style={styles.largeIcon} />
-            {cartCount > 0 && <span style={styles.cartBadge}>{cartCount}</span>}
-          </button>
+        <nav style={styles.nav} role="navigation" aria-label="Primary navigation">
+          {links.map((l) => {
+            const isActive = location.pathname === l.to;
+            return (
+              <Link key={l.to} to={l.to} style={styles.navButton(isActive)}>
+                {l.icon}
+                <span>{l.label}</span>
+              </Link>
+            );
+          })}
         </nav>
       )}
 
-      {/* Mobile Navigation */}
-      {isMobile && (
-        <div style={styles.mobileNav}>
+      <div style={styles.rightControls}>
+        {!isMobile && (
           <button
             type="button"
-            style={styles.mobileCommunicationButton}
             onClick={scrollToFooter}
-            aria-label="Communication"
+            title="Contact"
+            aria-label="Contact"
+            style={{ ...styles.iconButton(false), position: 'relative' }}
           >
-            <FaEnvelope style={styles.largeIcon} />
-            {cartCount > 0 && (
-              <span style={styles.mobileCartBadge}>{cartCount}</span>
-            )}
+            <FaEnvelope style={styles.envelopeIcon} />
+            {cartCount > 0 && <span style={styles.cartBadge}>{cartCount}</span>}
           </button>
+        )}
 
-          <button
-            type="button"
-            style={styles.mobileMenuButton}
-            onClick={toggleMobileMenu}
-            aria-label="Menu"
-          >
-            {mobileMenuOpen ? (
-              <FaTimes style={styles.largeIcon} />
-            ) : (
-              <FaBars style={styles.largeIcon} />
-            )}
-          </button>
-        </div>
-      )}
+        {/* Mobile controls */}
+        {isMobile && (
+          <div style={styles.mobileNav}>
+            <button style={{ ...styles.iconButton(false), position: 'relative' }} onClick={scrollToFooter} aria-label="Contact">
+              <FaEnvelope style={styles.envelopeIcon} />
+              {cartCount > 0 && <span style={styles.cartBadge}>{cartCount}</span>}
+            </button>
 
-      {/* Mobile Menu Overlay */}
+            <button
+              type="button"
+              onClick={toggleMobileMenu}
+              aria-label="Open menu"
+              style={{ ...styles.iconButton(mobileMenuOpen) }}
+            >
+              {mobileMenuOpen ? <FaTimes style={{ fontSize: 18, color: '#071127' }} /> : <FaBars style={{ fontSize: 18, color: '#071127' }} />}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile drawer */}
       {mobileMenuOpen && isMobile && (
         <div style={styles.mobileMenuOverlay} onClick={toggleMobileMenu}>
           <div style={styles.mobileMenu} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              style={styles.closeButton}
-              onClick={toggleMobileMenu}
-              aria-label="Close menu"
-            >
-              <FaTimes style={styles.largeIcon} />
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src={LogoB} alt="logo" style={{ height: 36 }} />
+              </div>
+              <button onClick={toggleMobileMenu} style={{ background: 'none', border: 'none', color: '#dff7fb', fontSize: 20 }} aria-label="Close menu"><FaTimes /></button>
+            </div>
 
-            <div style={styles.mobileMenuItems}>
-              <Link to="/" style={styles.mobileMenuItem} onClick={toggleMobileMenu}>
-                <FaHome style={styles.mobileIcon} /> Home
-              </Link>
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {links.map(l => {
+                const isActive = location.pathname === l.to;
+                return (
+                  <Link key={l.to} to={l.to} style={styles.mobileMenuItem(isActive)} onClick={() => setMobileMenuOpen(false)}>
+                    <span style={styles.mobileIcon}>{l.icon}</span>
+                    <span>{l.label}</span>
+                  </Link>
+                );
+              })}
 
-              <Link
-                to="/about"
-                style={styles.mobileMenuItem}
-                onClick={toggleMobileMenu}
-              >
-                <FaUser style={styles.mobileIcon} /> About
-              </Link>
-
-              <Link
-                to="/services"
-                style={styles.mobileMenuItem}
-                onClick={toggleMobileMenu}
-              >
-                <FaServicestack style={styles.mobileIcon} /> Services
-              </Link>
-
-              <Link
-                to="/projects"
-                style={styles.mobileMenuItem}
-                onClick={toggleMobileMenu}
-              >
-                <FaProjectDiagram style={styles.mobileIcon} /> Projects
-              </Link>
-
-              <button
-                type="button"
-                style={styles.mobileMenuItem}
-                onClick={scrollToFooter}
-              >
-                <FaEnvelope style={styles.mobileIcon} /> Contact Us
+              <button type="button" onClick={() => { scrollToFooter(); }} style={{ ...styles.mobileMenuItem(false), marginTop: 8 }}>
+                <FaEnvelope style={styles.mobileIcon} /> <span> Contact Us</span>
               </button>
             </div>
+
           </div>
         </div>
       )}
     </header>
   );
-};
-
-const styles = {
-  header: {
-    background: "linear-gradient(to right, #e6f7ff, #ffffff)",
-    color: "#2c3e50",
-    padding: "15px 20px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-    position: "sticky",
-    top: 0,
-    zIndex: 100,
-    height: "60px",
-    borderBottom: "1px solid #d1e8ff",
-  },
-  logoContainer: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-  },
-  logoImage: {
-    height: "40px",
-    cursor: "pointer",
-    maxWidth: "100%",
-  },
-  nav: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
-  navButton: {
-    backgroundColor: "#4e73df",
-    color: "white",
-    textDecoration: "none",
-    borderRadius: "30px",
-    padding: "8px 18px",
-    fontWeight: "500",
-    transition: "all 0.3s ease",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-  },
-  iconButton: {
-    background: "none",
-    border: "none",
-    color: "#4e73df",
-    padding: "8px",
-    borderRadius: "50%",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    transition: "all 0.3s ease",
-    fontSize: "24px",
-    width: "40px",
-    height: "40px",
-  },
-  largeIcon: {
-    fontSize: "24px",
-  },
-  cartBadge: {
-    backgroundColor: "#e74a3b",
-    color: "white",
-    borderRadius: "50%",
-    width: "20px",
-    height: "20px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: "12px",
-    position: "absolute",
-    top: "-5px",
-    right: "-5px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-  },
-  mobileNav: {
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-  },
-  mobileMenuButton: {
-    background: "none",
-    border: "none",
-    color: "#4e73df",
-    cursor: "pointer",
-    padding: "8px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "24px",
-    borderRadius: "50%",
-    width: "40px",
-    height: "40px",
-    transition: "all 0.3s ease",
-  },
-  mobileCommunicationButton: {
-    background: "none",
-    border: "none",
-    color: "#4e73df",
-    cursor: "pointer",
-    padding: "8px",
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "24px",
-    borderRadius: "50%",
-    width: "40px",
-    height: "40px",
-    transition: "all 0.3s ease",
-  },
-  mobileCartBadge: {
-    backgroundColor: "#e74a3b",
-    color: "white",
-    borderRadius: "50%",
-    width: "18px",
-    height: "18px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: "10px",
-    position: "absolute",
-    top: "-5px",
-    right: "-5px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-  },
-  mobileMenuOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 99,
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-  mobileMenu: {
-    width: "280px",
-    height: "100%",
-    backgroundColor: "white",
-    boxShadow: "-2px 0 15px rgba(0,0,0,0.1)",
-    padding: "20px",
-    position: "relative",
-    overflowY: "auto",
-  },
-  closeButton: {
-    background: "none",
-    border: "none",
-    color: "#4e73df",
-    cursor: "pointer",
-    position: "absolute",
-    top: "15px",
-    right: "15px",
-    fontSize: "24px",
-  },
-  mobileMenuItems: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    marginTop: "40px",
-  },
-  mobileMenuItem: {
-    padding: "15px 20px",
-    textDecoration: "none",
-    color: "#4e73df",
-    display: "flex",
-    alignItems: "center",
-    borderRadius: "8px",
-    transition: "all 0.3s",
-    fontWeight: "500",
-    backgroundColor: "#f8f9fc",
-    border: "none",
-    cursor: "pointer",
-    fontFamily: "inherit",
-    fontSize: "inherit",
-    textAlign: "left",
-    width: "100%",
-  },
-  mobileIcon: {
-    marginRight: "15px",
-    fontSize: "20px",
-    color: "#4e73df",
-    width: "24px",
-    textAlign: "center",
-  },
-};
-
-export default Header;
+}
