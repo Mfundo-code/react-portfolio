@@ -53,7 +53,7 @@ const ProjectsSection = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('http://127.0.0.1:8000/api/projects/by_category/');
+        const response = await fetch('https://mfundodev.com/api/projects/by_category/');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
@@ -137,9 +137,9 @@ const ProjectsSection = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
     if (typeof imagePath === 'string' && imagePath.startsWith('http')) return imagePath;
-    if (typeof imagePath === 'string') return `http://127.0.0.1:8000${imagePath}`;
+    if (typeof imagePath === 'string') return `https://mfundodev.com${imagePath}`;
     if (typeof imagePath === 'object' && imagePath.url) {
-      return imagePath.url.startsWith('http') ? imagePath.url : `http://127.0.0.1:8000${imagePath.url}`;
+      return imagePath.url.startsWith('http') ? imagePath.url : `https://mfundodev.com${imagePath.url}`;
     }
     return null;
   };
