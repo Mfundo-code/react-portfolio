@@ -1,5 +1,6 @@
 // HeroSection.js
 import React, { useEffect, useRef, useState } from "react";
+import LogoB from "../assets/images/LogoB.png";
 
 export default function HeroSection({
   imageUrl = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1200&q=80",
