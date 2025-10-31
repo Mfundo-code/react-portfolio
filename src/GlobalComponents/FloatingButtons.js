@@ -21,18 +21,18 @@ const FloatingButtons = () => {
   };
 
   const openWhatsApp = () => {
-    const message = `🚀 *Website Inquiry - Pest Control Services*
+    const message = `🚀 *Website Inquiry - Software Services*
 
 Hello! I visited your website and I'm interested in:
 
-🔹 Residential Pest Control
+🔹 Mobile Apps
 🔹 Commercial Solutions  
-🔹 Emergency Services
-🔹 Termite Control
-🔹 Mosquito & Fly Management
-🔹 Agricultural Protection
+🔹 Websites
+🔹 DNS management
+🔹 Professional Emails
+🔹 E-cormmerce Platforms
 
-*Chat started from: pestcontrolwebsite.com*
+*Chat started from: mfundodev.com*
 
 Please provide me with more information about your services and pricing. Thank you!`;
 
