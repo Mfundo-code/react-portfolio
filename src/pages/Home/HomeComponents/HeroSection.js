@@ -1,9 +1,10 @@
 // HeroSection.js
 import React, { useEffect, useRef, useState } from "react";
-import LogoB from "../assets/images/LogoB.png";
+import about from "../../../assets/images/about.png";
+
 
 export default function HeroSection({
-  imageUrl = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1200&q=80",
+  imageUrl = about,
   title = "Hi — I'm Your Name",
   subtitle = "I design and build scalable web & mobile apps. I like clean code, good UX and fast coffee.",
   primaryLabel = "View Portfolio",
@@ -288,6 +289,7 @@ export default function HeroSection({
       width: "100%",
       height: "100%",
       objectFit: "cover",
+      objectPosition: "center 5%", // Changed from "center 70%" to "center 30%" to push image up
       display: "block",
       transform: imageLoaded ? "scale(1.05)" : "scale(1)",
       filter: imageLoaded ? "grayscale(0.3) contrast(1.1)" : "grayscale(1) contrast(1)",
