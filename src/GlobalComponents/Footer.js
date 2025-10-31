@@ -9,6 +9,8 @@ const Footer = () => {
     message: ''
   });
   const [isMobile, setIsMobile] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -24,6 +26,22 @@ const Footer = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Helper function to get CSRF token
+  const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
 
   const fastLinks = [
     { name: "Home", path: "/" },
@@ -83,16 +101,80 @@ const Footer = () => {
       ...prev,
       [name]: value
     }));
+    // Clear status when user starts typing again
+    if (submitStatus) setSubmitStatus(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! I will get back to you soon.');
-    setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    // Basic validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setSubmitStatus({ type: 'error', message: 'Please fill in all fields.' });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setSubmitStatus({ type: 'error', message: 'Please enter a valid email address.' });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const csrfToken = getCookie('csrftoken');
+      const response = await fetch('http://127.0.0.1:8000/api/contact/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify(formData),
+        credentials: 'include', // Include cookies for CSRF
+      });
+
+      if (response.ok) {
+        setSubmitStatus({ 
+          type: 'success', 
+          message: 'Thank you for your message! I will get back to you soon.' 
+        });
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        let errorMessage = 'There was an error sending your message. Please try again.';
+        
+        // Handle specific error cases
+        if (response.status === 400) {
+          errorMessage = 'Please check your input and try again.';
+          if (errorData.email) {
+            errorMessage = `Email error: ${errorData.email[0]}`;
+          }
+        } else if (response.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
+        
+        setSubmitStatus({ 
+          type: 'error', 
+          message: errorMessage 
+        });
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      setSubmitStatus({ 
+        type: 'error', 
+        message: 'There was a network error. Please check your connection and try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Enhanced Neural Network Animation - More Visible
+  // Enhanced Neural Network Animation
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -111,40 +193,35 @@ const Footer = () => {
       constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.baseSize = Math.random() * 8 + 4; // Increased size
+        this.baseSize = Math.random() * 8 + 4;
         this.size = this.baseSize;
         this.symbol = techSymbols[Math.floor(Math.random() * techSymbols.length)];
-        this.pulseSpeed = 0.03 + Math.random() * 0.03; // Faster pulsing
+        this.pulseSpeed = 0.03 + Math.random() * 0.03;
         this.pulseOffset = Math.random() * Math.PI * 2;
-        this.vx = (Math.random() - 0.5) * 0.4; // Faster movement
+        this.vx = (Math.random() - 0.5) * 0.4;
         this.vy = (Math.random() - 0.5) * 0.4;
-        this.opacity = 0.2 + Math.random() * 0.3; // Much higher opacity
+        this.opacity = 0.2 + Math.random() * 0.3;
         this.hue = Math.random() * 60 + 200;
-        this.glowIntensity = 0.5 + Math.random() * 0.5; // Stronger glow
+        this.glowIntensity = 0.5 + Math.random() * 0.5;
       }
 
       update() {
-        // Pulsing effect - more pronounced
         this.size = this.baseSize + Math.sin(Date.now() * this.pulseSpeed + this.pulseOffset) * 3;
         
-        // Gentle floating movement
         this.x += this.vx;
         this.y += this.vy;
 
-        // Boundary check with gentle bounce
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
 
-        // Keep within bounds
         this.x = Math.max(0, Math.min(canvas.width, this.x));
         this.y = Math.max(0, Math.min(canvas.height, this.y));
       }
 
       draw() {
-        // Draw enhanced glow effect
         const gradient = ctx.createRadialGradient(
           this.x, this.y, 0,
-          this.x, this.y, this.size * 4 // Larger glow
+          this.x, this.y, this.size * 4
         );
         gradient.addColorStop(0, `hsla(${this.hue}, 80%, 70%, ${this.opacity * this.glowIntensity})`);
         gradient.addColorStop(0.5, `hsla(${this.hue}, 80%, 70%, ${this.opacity * this.glowIntensity * 0.5})`);
@@ -155,16 +232,14 @@ const Footer = () => {
         ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw main node - more vibrant
         ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.opacity})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw symbol for more nodes
-        if (Math.random() > 0.5) { // More frequent symbols
+        if (Math.random() > 0.5) {
           ctx.fillStyle = `hsla(${this.hue}, 100%, 95%, ${this.opacity * 1.5})`;
-          ctx.font = `${this.size * 1.4}px Arial`; // Larger symbols
+          ctx.font = `${this.size * 1.4}px Arial`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(this.symbol, this.x, this.y);
@@ -177,11 +252,11 @@ const Footer = () => {
         this.node1 = node1;
         this.node2 = node2;
         this.progress = Math.random() * Math.PI * 2;
-        this.speed = 0.03 + Math.random() * 0.03; // Faster animation
+        this.speed = 0.03 + Math.random() * 0.03;
         this.length = Math.sqrt(
           Math.pow(node2.x - node1.x, 2) + Math.pow(node2.y - node1.y, 2)
         );
-        this.pulseStrength = 0.3 + Math.random() * 0.4; // Stronger pulsing
+        this.pulseStrength = 0.3 + Math.random() * 0.4;
       }
 
       update() {
@@ -189,9 +264,8 @@ const Footer = () => {
       }
 
       draw() {
-        const alpha = (Math.sin(this.progress) + 1) * 0.3 + 0.2; // Higher base opacity
+        const alpha = (Math.sin(this.progress) + 1) * 0.3 + 0.2;
         
-        // Create gradient along the connection
         const gradient = ctx.createLinearGradient(
           this.node1.x, this.node1.y,
           this.node2.x, this.node2.y
@@ -201,7 +275,7 @@ const Footer = () => {
         gradient.addColorStop(1, `hsla(${this.node2.hue}, 80%, 70%, ${alpha * 0.6})`);
 
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = 1.5; // Thicker lines
+        ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 3]);
         ctx.lineDashOffset = -this.progress * 15;
 
@@ -222,7 +296,6 @@ const Footer = () => {
 
     const initNodes = () => {
       nodes = [];
-      // More nodes for better visibility
       const nodeCount = Math.min(35, Math.floor((canvas.width * canvas.height) / 5000));
       
       for (let i = 0; i < nodeCount; i++) {
@@ -235,7 +308,7 @@ const Footer = () => {
 
     const updateConnections = () => {
       connections = [];
-      const maxDistance = 180; // Longer connections
+      const maxDistance = 180;
 
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
@@ -243,7 +316,6 @@ const Footer = () => {
             Math.pow(nodes[j].x - nodes[i].x, 2) + Math.pow(nodes[j].y - nodes[i].y, 2)
           );
           
-          // More connections
           if (distance < maxDistance && Math.random() > 0.2) {
             connections.push(new Connection(nodes[i], nodes[j]));
           }
@@ -292,20 +364,17 @@ const Footer = () => {
 
       // Update and draw nodes
       nodes.forEach(node => {
-        // Enhanced mouse interaction
         if (mouse.active) {
           const dx = mouse.x - node.x;
           const dy = mouse.y - node.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
-          if (distance < 120) { // Larger interaction area
+          if (distance < 120) {
             const force = (120 - distance) / 120;
             node.x -= dx * force * 0.02;
             node.y -= dy * force * 0.02;
-            // Increase opacity when near mouse
             node.opacity = Math.min(0.8, node.opacity + 0.02);
           } else {
-            // Gradually return to normal opacity
             node.opacity = Math.max(0.2, node.opacity - 0.01);
           }
         }
@@ -455,6 +524,19 @@ const Footer = () => {
       transition: "all 0.3s ease",
       boxShadow: "0 6px 20px rgba(99, 102, 241, 0.4)",
       marginTop: "6px",
+      opacity: isSubmitting ? 0.7 : 1,
+      pointerEvents: isSubmitting ? "none" : "auto",
+    },
+    statusMessage: {
+      padding: "10px",
+      borderRadius: "8px",
+      textAlign: "center",
+      fontSize: "0.85rem",
+      fontWeight: "600",
+      marginTop: "10px",
+      background: submitStatus?.type === 'success' ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
+      color: submitStatus?.type === 'success' ? "#16a34a" : "#dc2626",
+      border: `1px solid ${submitStatus?.type === 'success' ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)"}`,
     },
     socialContainer: {
       width: "100%",
@@ -604,6 +686,7 @@ const Footer = () => {
               onChange={handleInputChange}
               style={styles.input}
               required
+              disabled={isSubmitting}
               whileFocus={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             />
@@ -615,6 +698,7 @@ const Footer = () => {
               onChange={handleInputChange}
               style={styles.input}
               required
+              disabled={isSubmitting}
               whileFocus={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             />
@@ -626,6 +710,7 @@ const Footer = () => {
               style={styles.textarea}
               rows="6"
               required
+              disabled={isSubmitting}
               whileFocus={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             />
@@ -633,11 +718,24 @@ const Footer = () => {
               type="button"
               onClick={handleSubmit}
               style={styles.submitButton}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
+              disabled={isSubmitting}
+              whileHover={!isSubmitting ? { scale: 1.05, y: -2 } : {}}
+              whileTap={!isSubmitting ? { scale: 0.95 } : {}}
             >
-              Send Message
+              {isSubmitting ? "Sending..." : "Send Message"}
             </motion.button>
+
+            {/* Status Message */}
+            {submitStatus && (
+              <motion.div
+                style={styles.statusMessage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {submitStatus.message}
+              </motion.div>
+            )}
           </div>
 
           {/* Social Links */}
@@ -717,6 +815,7 @@ const Footer = () => {
 
           {/* Contact Info Column */}
           <div style={styles.contactColumn}>
+            <h3 style={styles.sectionTitle}>Contact Info</h3>
             <div style={styles.contactItem}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={styles.contactIcon}>
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" 
@@ -736,7 +835,7 @@ const Footer = () => {
               </svg>
               <div>
                 <p style={styles.contactLabel}>Email</p>
-                <a href="mailto:mfundo@example.com" style={styles.contactValue}>mfundo@example.com</a>
+                <a href="mailto:mfundoknox@gmail.com" style={styles.contactValue}>mfundoknox@gmail.com</a>
               </div>
             </div>
 

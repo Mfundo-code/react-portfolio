@@ -274,7 +274,7 @@ export default function Header({ cartCount = 0 }) {
               })}
 
               <button type="button" onClick={() => { scrollToFooter(); }} style={{ ...styles.mobileMenuItem(false), marginTop: 8 }}>
-                <FaEnvelope style={styles.mobileIcon} /> <span> Contact Us</span>
+                <FaEnvelope style={styles.mobileIcon} /> <span> Contact Me</span>
               </button>
             </div>
 

@@ -17,7 +17,7 @@ export default function TechSkills() {
           name: "Frontend",
           level: 92,
           description: "Building modern, scalable web applications with React, Vue, and TypeScript",
-          projects: ["mfundodev.com Portfolio", "E-commerce Platforms", "Admin Dashboards"],
+          projects: ["Deployed projects", "E-commerce Platforms", "Admin Dashboards"],
           tools: ["Vue", "TypeScript", "Tailwind CSS", "React"]
         },
         {
