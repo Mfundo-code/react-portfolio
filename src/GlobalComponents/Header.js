@@ -1,26 +1,47 @@
 // src/GlobalComponents/Header.js
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   FaBars,
   FaTimes,
   FaHome,
-  FaInfoCircle,
   FaEnvelope,
   FaProjectDiagram,
-  FaBlog,
   FaServicestack,
 } from "react-icons/fa";
 import LogoB from "../assets/images/LogoB.png";
 
 const Header = ({ cartCount = 0 }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const navigate = useNavigate();
 
-  const toggleDropdown = () => setShowDropdown((s) => !s);
   const toggleMobileMenu = () => setMobileMenuOpen((s) => !s);
+
+  // Scroll to footer function
+  const scrollToFooter = () => {
+    const footer = document.querySelector('footer');
+    if (footer) {
+      footer.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    // Close mobile menu if open
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+
+  // Handle logo click - scroll to top or navigate home
+  const handleLogoClick = () => {
+    // If we're not on home page, navigate to home
+    if (window.location.pathname !== '/') {
+      window.location.href = '/';
+    } else {
+      // If already on home page, scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const checkIfMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -36,7 +57,7 @@ const Header = ({ cartCount = 0 }) => {
           src={LogoB}
           alt="Mahlaku Apparel Logo"
           style={styles.logoImage}
-          onClick={() => navigate("/")}
+          onClick={handleLogoClick}
         />
       </div>
 
@@ -59,41 +80,10 @@ const Header = ({ cartCount = 0 }) => {
             Projects
           </Link>
 
-          <Link to="/blog" style={styles.navButton}>
-            Blog
-          </Link>
-
-          <div style={styles.dropdownContainer}>
-            <button
-              type="button"
-              style={styles.iconButton}
-              onClick={toggleDropdown}
-              aria-expanded={showDropdown}
-              aria-label="More options"
-            >
-              <FaInfoCircle style={styles.largeIcon} />
-            </button>
-
-            {showDropdown && (
-              <div style={styles.dropdownMenu} role="menu">
-                <Link to="/about" style={styles.dropdownItem} role="menuitem">
-                  About Us
-                </Link>
-                <Link
-                  to="/contacts"
-                  style={styles.dropdownItem}
-                  role="menuitem"
-                >
-                  Contact Us
-                </Link>
-              </div>
-            )}
-          </div>
-
           <button
             type="button"
             style={styles.iconButton}
-            onClick={() => navigate("/contacts")}
+            onClick={scrollToFooter}
             aria-label="Contact"
           >
             <FaEnvelope style={styles.largeIcon} />
@@ -108,7 +98,7 @@ const Header = ({ cartCount = 0 }) => {
           <button
             type="button"
             style={styles.mobileCommunicationButton}
-            onClick={() => navigate("/contacts")}
+            onClick={scrollToFooter}
             aria-label="Communication"
           >
             <FaEnvelope style={styles.largeIcon} />
@@ -155,7 +145,7 @@ const Header = ({ cartCount = 0 }) => {
                 style={styles.mobileMenuItem}
                 onClick={toggleMobileMenu}
               >
-                <FaInfoCircle style={styles.mobileIcon} /> About
+                About
               </Link>
 
               <Link
@@ -174,21 +164,13 @@ const Header = ({ cartCount = 0 }) => {
                 <FaProjectDiagram style={styles.mobileIcon} /> Projects
               </Link>
 
-              <Link
-                to="/blog"
+              <button
+                type="button"
                 style={styles.mobileMenuItem}
-                onClick={toggleMobileMenu}
-              >
-                <FaBlog style={styles.mobileIcon} /> Blog
-              </Link>
-
-              <Link
-                to="/contacts"
-                style={styles.mobileMenuItem}
-                onClick={toggleMobileMenu}
+                onClick={scrollToFooter}
               >
                 <FaEnvelope style={styles.mobileIcon} /> Contact Us
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -255,29 +237,6 @@ const styles = {
   },
   largeIcon: {
     fontSize: "24px",
-  },
-  dropdownContainer: {
-    position: "relative",
-  },
-  dropdownMenu: {
-    position: "absolute",
-    top: "100%",
-    right: 0,
-    backgroundColor: "white",
-    boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-    borderRadius: "8px",
-    minWidth: "180px",
-    zIndex: 100,
-    padding: "10px 0",
-    border: "1px solid #e3e6f0",
-  },
-  dropdownItem: {
-    display: "block",
-    padding: "10px 20px",
-    textDecoration: "none",
-    color: "#4e73df",
-    fontWeight: "500",
-    transition: "all 0.2s",
   },
   cartBadge: {
     backgroundColor: "#e74a3b",
@@ -391,6 +350,12 @@ const styles = {
     transition: "all 0.3s",
     fontWeight: "500",
     backgroundColor: "#f8f9fc",
+    border: "none",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    fontSize: "inherit",
+    textAlign: "left",
+    width: "100%",
   },
   mobileIcon: {
     marginRight: "15px",
