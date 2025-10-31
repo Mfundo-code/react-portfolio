@@ -192,7 +192,7 @@ export default function Header({ cartCount = 0 }) {
   const links = [
     { to: '/', label: 'Home', icon: <FaHome /> },
     { to: '/about', label: 'About', icon: <FaUser /> },
-    { to: '/services', label: 'Services', icon: <FaServicestack /> },
+    { to: '/services', label: 'Tech-Expertise', icon: <FaServicestack /> },
     { to: '/projects', label: 'Projects', icon: <FaProjectDiagram /> },
   ];
 
