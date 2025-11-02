@@ -293,7 +293,7 @@ export default function AboutMe() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
             >
-              I'm a freelance developer specializing in building robust web applications, 
+              I'm a full-stake developer specializing in building robust web applications, 
               mobile apps, and desktop solutions. With expertise in JavaScript, React, 
               React Native, Electron, Python Django, and C# .NET, I transform ideas into 
               functional, user-friendly digital products.

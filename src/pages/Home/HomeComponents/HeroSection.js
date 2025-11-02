@@ -6,7 +6,7 @@ import about from "../../../assets/images/about.png";
 export default function HeroSection({
   imageUrl = about,
   title = "Mfundo Dlamini",
-  subtitle = "Full-Stack Developer | Building Modern Web, Mobile Application and Custom Software Solutions",
+  subtitle = "Full-Stack Developer | Building Modern Software Solutions I'm Available for Contracts and FullTime Positions",
   primaryLabel = "View My Projects",
   onPrimary = () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }),
 }) {

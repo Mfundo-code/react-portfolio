@@ -590,7 +590,7 @@ const Footer = () => {
     },
     linkButton: {
       display: "block",
-      padding: "6.5px 16px",
+      padding: "13.5px 16px",
       background: "rgba(255, 255, 255, 0.85)",
       backdropFilter: "blur(15px)",
       borderRadius: "10px",
