@@ -5,13 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
  * ProjectsSection (category-per-slide, random 3 projects)
  * - Each slide shows up to 3 random projects from one category
  * - Slides move to the next category (no paging inside a category)
- * - Prev/Next move between categories
  * - Auto-rotates through categories every 5s
  * - Special handling for "mobile" categories: taller container + objectFit: 'contain'
  * - "More..." button for featured projects (blinking). Clicking opens modal with full info including description.
- *
- * Fixes applied: improved centering and sizing logic for mobile screenshots so that
- * mobile-app project images stay centered inside the card across viewport sizes.
+ * - Fully mobile responsive with centered layout
  */
 
 const ProjectsSection = () => {
@@ -121,16 +118,6 @@ const ProjectsSection = () => {
     return () => window.removeEventListener('keydown', handler);
   }, [selectedProject]);
 
-  const nextSlide = () => {
-    if (!categories.length) return;
-    setCurrentCategoryIndex(prev => (prev + 1) % categories.length);
-  };
-
-  const prevSlide = () => {
-    if (!categories.length) return;
-    setCurrentCategoryIndex(prev => (prev - 1 + categories.length) % categories.length);
-  };
-
   const goToCategory = (index) => {
     if (index < 0 || index >= categories.length) return;
     setCurrentCategoryIndex(index);
@@ -234,14 +221,8 @@ const ProjectsSection = () => {
           ))}
         </div>
 
-        {/* Projects Display (ONLY images / cards after the nav) */}
+        {/* Projects Display */}
         <div style={styles.carouselContainer}>
-          <button style={styles.navButton} onClick={prevSlide} aria-label="Previous category" disabled={!categories.length}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-
           <div style={styles.carouselContent}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -267,8 +248,6 @@ const ProjectsSection = () => {
                       height: isMobileCategory ? 360 : styles.imageContainer.height,
                       background: isMobileCategory ? '#ffffff' : styles.imageContainer.background,
                       padding: isMobileCategory ? 12 : 0,
-
-                      // ensure centering for any viewport: use flex + boxSizing
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -276,13 +255,9 @@ const ProjectsSection = () => {
                       textAlign: 'center',
                     };
 
-                    // For mobile screenshots we want the image to never overflow and always be centered.
-                    // Use maxWidth and maxHeight paired with objectFit: 'contain'. Use width:auto to preserve aspect ratio.
                     const dynamicImgStyle = {
                       ...styles.projectImage,
                       objectFit: isMobileCategory ? 'contain' : 'cover',
-
-                      // ensure image stays inside the padded container and is horizontally centered
                       maxWidth: isMobileCategory ? 'calc(100% - 24px)' : '100%',
                       maxHeight: isMobileCategory ? 336 : '100%',
                       width: isMobileCategory ? 'auto' : '100%',
@@ -380,12 +355,6 @@ const ProjectsSection = () => {
               </motion.div>
             </AnimatePresence>
           </div>
-
-          <button style={styles.navButton} onClick={nextSlide} aria-label="Next category" disabled={!categories.length}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
         </div>
 
         {/* Category Indicators */}
@@ -528,11 +497,14 @@ const styles = {
     background: '#ffffff',
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     minHeight: 'auto',
+    width: '100%',
+    overflowX: 'hidden',
   },
   container: {
     maxWidth: 1200,
     margin: '0 auto',
     position: 'relative',
+    padding: '0 15px',
   },
   title: {
     fontSize: 'clamp(2rem, 5vw, 3rem)',
@@ -551,6 +523,7 @@ const styles = {
     gap: '12px',
     marginBottom: '40px',
     flexWrap: 'wrap',
+    padding: '0 10px',
   },
   categoryButton: {
     padding: '12px 24px',
@@ -577,28 +550,14 @@ const styles = {
   carouselContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '20px',
     marginBottom: '10px',
-  },
-  navButton: {
-    width: '50px',
-    height: '50px',
-    borderRadius: '50%',
-    border: '1px solid #e2e8f0',
-    background: '#ffffff',
-    color: '#4a5568',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-    flexShrink: 0,
+    width: '100%',
   },
   carouselContent: {
     flex: 1,
     minHeight: '500px',
     position: 'relative',
+    width: '100%',
   },
   categorySection: {
     width: '100%',
@@ -607,7 +566,8 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '24px',
-    padding: '0 20px',
+    padding: '0 10px',
+    justifyContent: 'center',
   },
   projectCard: {
     background: '#ffffff',
@@ -686,7 +646,6 @@ const styles = {
     gap: '6px',
     marginBottom: '16px',
   },
-  // Updated toolTag to neutral colors (no blue)
   toolTag: {
     background: '#f8f9fa',
     color: '#4a5568',
@@ -711,8 +670,6 @@ const styles = {
   projectDate: {
     color: '#a0aec0',
   },
-
-  // Enhanced Blinking More button style with multiple animations - this remains blue
   blinkMoreButton: {
     background: 'linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%)',
     color: '#ffffff',
@@ -728,7 +685,6 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
   },
-
   indicators: {
     display: 'flex',
     justifyContent: 'center',
@@ -811,8 +767,6 @@ const styles = {
     fontSize: '1rem',
     margin: 0,
   },
-
-  /* Enhanced Modal styles */
   modalOverlay: {
     position: 'fixed',
     inset: 0,
@@ -902,7 +856,6 @@ const styles = {
     fontSize: 14,
     transition: 'all 0.3s ease',
   },
-  // Updated toolTagInline to neutral colors (no blue)
   toolTagInline: {
     background: '#f8f9fa',
     color: '#4a5568',

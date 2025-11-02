@@ -15,7 +15,11 @@ const Footer = () => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Check if mobile on mount and resize
+  // API Configuration - Change this for testing
+  const API_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://127.0.0.1:8000/api/contact/'
+    : 'https://www.mfundodev.com/api/contact/';
+
   useEffect(() => {
     function checkMobile() {
       if (typeof window === "undefined") return;
@@ -27,7 +31,6 @@ const Footer = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Helper function to get CSRF token
   const getCookie = (name) => {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -101,7 +104,6 @@ const Footer = () => {
       ...prev,
       [name]: value
     }));
-    // Clear status when user starts typing again
     if (submitStatus) setSubmitStatus(null);
   };
 
@@ -110,14 +112,13 @@ const Footer = () => {
     setIsSubmitting(true);
     setSubmitStatus(null);
 
-    // Basic validation
+    // Validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setSubmitStatus({ type: 'error', message: 'Please fill in all fields.' });
       setIsSubmitting(false);
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setSubmitStatus({ type: 'error', message: 'Please enter a valid email address.' });
@@ -126,55 +127,73 @@ const Footer = () => {
     }
 
     try {
+      console.log('Submitting to:', API_URL);
+      
       const csrfToken = getCookie('csrftoken');
-      const response = await fetch('https://mfundodev.com/api/contact/', {
+      console.log('CSRF Token:', csrfToken ? 'Found' : 'Not found');
+
+      const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify(formData),
-        credentials: 'include', // Include cookies for CSRF
-      });
+        credentials: 'include',
+      };
+
+      // Only add CSRF token if it exists
+      if (csrfToken) {
+        requestOptions.headers['X-CSRFToken'] = csrfToken;
+      }
+
+      const response = await fetch(API_URL, requestOptions);
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (response.ok) {
         setSubmitStatus({ 
           type: 'success', 
-          message: 'Thank you for your message! I will get back to you soon.' 
+          message: 'Thank you for your message! I have received it and will respond to you personally soon.' 
         });
         setFormData({ name: '', email: '', message: '' });
       } else {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Server error:', response.status, errorData);
+        
         let errorMessage = 'There was an error sending your message. Please try again.';
         
-        // Handle specific error cases
-        if (response.status === 400) {
+        if (response.status === 403) {
+          errorMessage = 'CSRF verification failed. Please refresh the page and try again.';
+        } else if (response.status === 400) {
           errorMessage = 'Please check your input and try again.';
           if (errorData.email) {
             errorMessage = `Email error: ${errorData.email[0]}`;
           }
         } else if (response.status === 500) {
           errorMessage = 'Server error. Please try again later.';
+        } else if (response.status === 0 || !response.status) {
+          errorMessage = 'Cannot connect to server. Please check your internet connection.';
         }
         
-        setSubmitStatus({ 
-          type: 'error', 
-          message: errorMessage 
-        });
+        setSubmitStatus({ type: 'error', message: errorMessage });
       }
     } catch (error) {
       console.error('Network error:', error);
-      setSubmitStatus({ 
-        type: 'error', 
-        message: 'There was a network error. Please check your connection and try again.' 
-      });
+      
+      let errorMessage = 'There was a network error. Please check your connection and try again.';
+      
+      if (error.message.includes('CORS')) {
+        errorMessage = 'Connection blocked by browser security. Please contact support.';
+      }
+      
+      setSubmitStatus({ type: 'error', message: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Enhanced Neural Network Animation
+  // Canvas animation
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -186,7 +205,6 @@ const Footer = () => {
     let connections = [];
     const mouse = { x: 0, y: 0, active: false };
 
-    // Tech icons/symbols for nodes
     const techSymbols = ['⚡', '🚀', '💻', '🔗', '🌐', '📱', '🔧', '🎯', '✨', '🌟'];
 
     class Node {
@@ -253,10 +271,6 @@ const Footer = () => {
         this.node2 = node2;
         this.progress = Math.random() * Math.PI * 2;
         this.speed = 0.03 + Math.random() * 0.03;
-        this.length = Math.sqrt(
-          Math.pow(node2.x - node1.x, 2) + Math.pow(node2.y - node1.y, 2)
-        );
-        this.pulseStrength = 0.3 + Math.random() * 0.4;
       }
 
       update() {
@@ -337,7 +351,6 @@ const Footer = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw enhanced background grid
       ctx.strokeStyle = 'rgba(99, 102, 241, 0.08)';
       ctx.lineWidth = 0.8;
       const gridSize = 50;
@@ -356,13 +369,11 @@ const Footer = () => {
         ctx.stroke();
       }
 
-      // Update and draw connections first (behind nodes)
       connections.forEach(connection => {
         connection.update();
         connection.draw();
       });
 
-      // Update and draw nodes
       nodes.forEach(node => {
         if (mouse.active) {
           const dx = mouse.x - node.x;
@@ -393,10 +404,8 @@ const Footer = () => {
       animate();
     };
 
-    // Initialize
     init();
 
-    // Event listeners
     window.addEventListener('resize', () => {
       resizeCanvas();
       initNodes();
@@ -414,7 +423,6 @@ const Footer = () => {
     };
   }, []);
 
-  // Base styles
   const styles = {
     container: {
       background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
@@ -658,16 +666,13 @@ const Footer = () => {
 
   return (
     <footer ref={containerRef} style={styles.container}>
-      {/* Enhanced Neural Network Animation Background */}
       <canvas 
         ref={canvasRef} 
         style={styles.canvas}
         aria-hidden="true"
       />
 
-      {/* Main Footer Content */}
       <div style={styles.mainContent}>
-        {/* Contact Form Section */}
         <motion.div 
           style={styles.contactSection}
           initial={{ opacity: 0, y: 20 }}
@@ -676,7 +681,6 @@ const Footer = () => {
         >
           <h3 style={styles.sectionTitle}>Get In Touch</h3>
           
-          {/* Contact Form */}
           <div style={styles.form}>
             <motion.input
               type="text"
@@ -725,7 +729,6 @@ const Footer = () => {
               {isSubmitting ? "Sending..." : "Send Message"}
             </motion.button>
 
-            {/* Status Message */}
             {submitStatus && (
               <motion.div
                 style={styles.statusMessage}
@@ -738,7 +741,6 @@ const Footer = () => {
             )}
           </div>
 
-          {/* Social Links */}
           <div style={styles.socialContainer}>
             <div style={styles.socialLinks}>
               {socialLinks.map((social, index) => (
@@ -762,17 +764,14 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* Spacer for desktop layout */}
         <div style={styles.formSpacer}></div>
 
-        {/* Right Section - Links and Contact Info */}
         <motion.div 
           style={styles.rightSection}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {/* Quick Links Column */}
           <div style={styles.linksColumn}>
             <h3 style={styles.sectionTitle}>Quick Links</h3>
             <nav style={styles.linksList}>
@@ -813,7 +812,6 @@ const Footer = () => {
             </nav>
           </div>
 
-          {/* Contact Info Column */}
           <div style={styles.contactColumn}>
             <h3 style={styles.sectionTitle}>Contact Info</h3>
             <div style={styles.contactItem}>
@@ -853,7 +851,6 @@ const Footer = () => {
         </motion.div>
       </div>
 
-      {/* Bottom Bar */}
       <motion.div 
         style={styles.bottomBar}
         initial={{ opacity: 0 }}
