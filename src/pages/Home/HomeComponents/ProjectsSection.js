@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-/**
- * ProjectsSection (category-per-slide, random 3 projects)
- * - Each slide shows up to 3 random projects from one category
- * - Slides move to the next category (no paging inside a category)
- * - Auto-rotates through categories every 5s
- * - Special handling for "mobile" categories: taller container + objectFit: 'contain'
- * - "More..." button for featured projects (blinking). Clicking opens modal with full info including description.
- * - Fully mobile responsive with centered layout
- */
 
 const ProjectsSection = () => {
   const [categories, setCategories] = useState([]);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-  const [currentSlideProjects, setCurrentSlideProjects] = useState([]);
+  const [currentProjects, setCurrentProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [autoSlideActive, setAutoSlideActive] = useState(true);
+  const [showingAllProjects, setShowingAllProjects] = useState(false);
 
   // modal
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // Ref to store interval ID
+  const slideIntervalRef = useRef(null);
 
   // inject spinner + blink keyframes once (clean up on unmount)
   useEffect(() => {
@@ -45,6 +40,15 @@ const ProjectsSection = () => {
       if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
     };
   }, []);
+
+  // Function to stop auto-sliding
+  const stopAutoSlide = () => {
+    if (slideIntervalRef.current) {
+      clearInterval(slideIntervalRef.current);
+      slideIntervalRef.current = null;
+    }
+    setAutoSlideActive(false);
+  };
 
   // Fetch grouped-by-category data from backend
   useEffect(() => {
@@ -89,25 +93,45 @@ const ProjectsSection = () => {
     return a.slice(0, n);
   };
 
-  // Whenever category changes (or categories load), pick up to 3 random projects for the slide
+  // Whenever category changes (or categories load), update projects
   useEffect(() => {
     if (!categories.length) {
-      setCurrentSlideProjects([]);
+      setCurrentProjects([]);
       return;
     }
+    
     const cat = categories[currentCategoryIndex];
-    const picks = randomSample(cat.projects || [], 3);
-    setCurrentSlideProjects(picks);
-  }, [categories, currentCategoryIndex]);
+    
+    if (showingAllProjects || !autoSlideActive) {
+      // Show ALL projects when user clicked a category or auto-slide is stopped
+      setCurrentProjects(cat.projects || []);
+    } else {
+      // Show random 3 projects during auto-slide
+      const picks = randomSample(cat.projects || [], 3);
+      setCurrentProjects(picks);
+    }
+  }, [categories, currentCategoryIndex, showingAllProjects, autoSlideActive]);
 
-  // Auto-rotate through categories
+  // Auto-rotate through categories - only when autoSlideActive is true AND showingAllProjects is false
   useEffect(() => {
-    if (!categories.length) return;
-    const interval = setInterval(() => {
+    if (!categories.length || !autoSlideActive || showingAllProjects) return;
+    
+    // Clear any existing interval
+    if (slideIntervalRef.current) {
+      clearInterval(slideIntervalRef.current);
+    }
+    
+    slideIntervalRef.current = setInterval(() => {
       setCurrentCategoryIndex(prev => (prev + 1) % categories.length);
     }, 5000);
-    return () => clearInterval(interval);
-  }, [categories]);
+    
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      if (slideIntervalRef.current) {
+        clearInterval(slideIntervalRef.current);
+      }
+    };
+  }, [categories, autoSlideActive, showingAllProjects]);
 
   // close modal on Escape
   useEffect(() => {
@@ -120,6 +144,16 @@ const ProjectsSection = () => {
 
   const goToCategory = (index) => {
     if (index < 0 || index >= categories.length) return;
+    
+    stopAutoSlide();
+    
+    // If clicking the same category that's already showing all projects, do nothing
+    if (index === currentCategoryIndex && showingAllProjects) {
+      return;
+    }
+    
+    // Set showing all projects to true
+    setShowingAllProjects(true);
     setCurrentCategoryIndex(index);
   };
 
@@ -132,6 +166,24 @@ const ProjectsSection = () => {
       return imagePath.url.startsWith('http') ? imagePath.url : `https://mfundodev.com${imagePath.url}`;
     }
     return null;
+  };
+
+  const openProjectModal = (project) => {
+    stopAutoSlide();
+    setShowingAllProjects(true);
+    setSelectedProject(project || null);
+  };
+
+  const closeProjectModal = () => {
+    setSelectedProject(null);
+  };
+
+  // Add stopAutoSlide to all button clicks
+  const handleButtonInteraction = () => {
+    stopAutoSlide();
+    if (!showingAllProjects) {
+      setShowingAllProjects(true);
+    }
   };
 
   if (loading) {
@@ -151,7 +203,13 @@ const ProjectsSection = () => {
         <div style={styles.errorContainer}>
           <h3 style={styles.errorTitle}>Unable to load projects</h3>
           <p style={styles.errorText}>{error}</p>
-          <button style={styles.retryButton} onClick={() => window.location.reload()}>Try Again</button>
+          <button 
+            style={styles.retryButton} 
+            onClick={() => window.location.reload()}
+            onMouseDown={handleButtonInteraction}
+          >
+            Try Again
+          </button>
         </div>
       </section>
     );
@@ -169,20 +227,7 @@ const ProjectsSection = () => {
   }
 
   const currentCategory = categories[currentCategoryIndex];
-  const currentProjects = currentSlideProjects;
-
-  // detect mobile-like categories to show full mobile screenshots:
   const isMobileCategory = /mobile|app|application|android|ios/i.test(currentCategory.name || '');
-
-  // open modal
-  const openProjectModal = (project) => {
-    setSelectedProject(project || null);
-  };
-
-  // close modal (also used when clicking overlay)
-  const closeProjectModal = () => {
-    setSelectedProject(null);
-  };
 
   return (
     <section style={styles.section} aria-labelledby="projects-heading">
@@ -197,10 +242,23 @@ const ProjectsSection = () => {
           Featured Projects
         </motion.h2>
 
+        {/* Auto-slide status indicator (hidden when showing all projects) */}
+        {autoSlideActive && !showingAllProjects && (
+          <div style={styles.autoSlideIndicator}>
+            <span style={styles.autoSlideDot}></span>
+            Auto-sliding (3 random projects)
+          </div>
+        )}
+
         {/* Dynamic Category Title */}
         <div style={{ textAlign: 'center', marginBottom: 12 }}>
           <strong style={{ color: '#4a5568' }}>Now showing:</strong>{' '}
           <span style={{ fontWeight: 800, fontSize: 18 }}>{currentCategory.name}</span>
+          {showingAllProjects && (
+            <span style={{ marginLeft: 8, color: '#3182ce', fontWeight: 600 }}>
+              ({currentProjects.length} projects)
+            </span>
+          )}
         </div>
 
         {/* Category Navigation */}
@@ -213,6 +271,7 @@ const ProjectsSection = () => {
                 ...(index === currentCategoryIndex ? styles.activeCategoryButton : {})
               }}
               onClick={() => goToCategory(index)}
+              onMouseDown={handleButtonInteraction}
               aria-label={`Show ${category.name} projects`}
             >
               {category.name}
@@ -223,10 +282,13 @@ const ProjectsSection = () => {
 
         {/* Projects Display */}
         <div style={styles.carouselContainer}>
-          <div style={styles.carouselContent}>
+          <div style={{
+            ...styles.carouselContent,
+            minHeight: showingAllProjects ? 'auto' : '500px'
+          }}>
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentCategoryIndex}
+                key={`${currentCategoryIndex}-${showingAllProjects ? 'all' : 'slide'}`}
                 style={styles.categorySection}
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -235,14 +297,17 @@ const ProjectsSection = () => {
               >
                 <div style={{
                   ...styles.projectsGrid,
-                  alignItems: 'start'
+                  alignItems: 'start',
+                  gridTemplateColumns: showingAllProjects 
+                    ? 'repeat(auto-fill, minmax(300px, 1fr))' 
+                    : 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: showingAllProjects ? '20px' : '24px'
                 }}>
                   {currentProjects.map((project, index) => {
                     const tools = project.tools_list && Array.isArray(project.tools_list)
                       ? project.tools_list
                       : (project.tools_used ? String(project.tools_used).split(',').map(t => t.trim()) : []);
 
-                    // dynamic container & image styles for mobile categories
                     const dynamicImageContainerStyle = {
                       ...styles.imageContainer,
                       height: isMobileCategory ? 360 : styles.imageContainer.height,
@@ -272,10 +337,13 @@ const ProjectsSection = () => {
                     return (
                       <motion.div
                         key={project.id || `${index}-${currentCategoryIndex}`}
-                        style={styles.projectCard}
+                        style={{
+                          ...styles.projectCard,
+                          ...(showingAllProjects && styles.allProjectsCard)
+                        }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        transition={{ duration: 0.5, delay: index * 0.05 }}
                         whileHover={{ y: -5, scale: 1.02 }}
                       >
                         <div style={dynamicImageContainerStyle}>
@@ -299,14 +367,28 @@ const ProjectsSection = () => {
                           <div style={styles.projectOverlay}>
                             <div style={styles.projectActions}>
                               {project.repo_link && (
-                                <a href={project.repo_link} style={styles.actionButton} target="_blank" rel="noopener noreferrer" aria-label="View code repository">
+                                <a 
+                                  href={project.repo_link} 
+                                  style={styles.actionButton} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  aria-label="View code repository"
+                                  onMouseDown={handleButtonInteraction}
+                                >
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                                 </a>
                               )}
                               {project.live_link && (
-                                <a href={project.live_link} style={styles.actionButton} target="_blank" rel="noopener noreferrer" aria-label="View live demo">
+                                <a 
+                                  href={project.live_link} 
+                                  style={styles.actionButton} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  aria-label="View live demo"
+                                  onMouseDown={handleButtonInteraction}
+                                >
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                     <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -321,7 +403,7 @@ const ProjectsSection = () => {
                         <div style={styles.projectContent}>
                           <h4 style={styles.projectName}>{project.title || 'Untitled Project'}</h4>
 
-                          {/* Tools Preview - Only show tools, no description */}
+                          {/* Tools Preview */}
                           <div style={styles.toolsContainer}>
                             {tools.slice(0, 3).map((tool, toolIndex) => (
                               <span key={toolIndex} style={styles.toolTag}>{tool}</span>
@@ -334,17 +416,21 @@ const ProjectsSection = () => {
                               {project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
                             </span>
 
-                            {/* For featured projects show the blinking More button */}
-                            {project.featured ? (
+                            {/* Show "More info" button for featured projects or when showing all */}
+                            {(project.featured || showingAllProjects) ? (
                               <button
                                 onClick={() => openProjectModal(project)}
-                                style={styles.blinkMoreButton}
+                                onMouseDown={handleButtonInteraction}
+                                style={{
+                                  ...styles.blinkMoreButton,
+                                  animation: project.featured ? 'blinkPulse 1.6s infinite, subtleGlow 2s infinite' : 'none'
+                                }}
                                 aria-label={`More about ${project.title || 'project'}`}
                               >
-                                more about the project...
+                                {showingAllProjects ? 'View details' : 'more about the project...'}
                               </button>
                             ) : (
-                              <div style={{ width: 72 }} /> /* placeholder to keep alignment */
+                              <div style={{ width: 72 }} />
                             )}
                           </div>
                         </div>
@@ -367,6 +453,7 @@ const ProjectsSection = () => {
                 ...(index === currentCategoryIndex ? styles.activeIndicator : {})
               }}
               onClick={() => goToCategory(index)}
+              onMouseDown={handleButtonInteraction}
               aria-label={`Go to ${category.name} projects`}
             />
           ))}
@@ -397,7 +484,14 @@ const ProjectsSection = () => {
             >
               <div style={styles.modalHeader}>
                 <h3 style={styles.modalTitle}>{selectedProject.title || 'Project details'}</h3>
-                <button onClick={closeProjectModal} style={styles.modalClose} aria-label="Close details">×</button>
+                <button 
+                  onClick={closeProjectModal} 
+                  style={styles.modalClose} 
+                  aria-label="Close details"
+                  onMouseDown={handleButtonInteraction}
+                >
+                  ×
+                </button>
               </div>
 
               <div style={styles.modalBody}>
@@ -449,7 +543,13 @@ const ProjectsSection = () => {
                   <h4 style={styles.modalSectionTitle}>Links</h4>
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     {selectedProject.repo_link ? (
-                      <a href={selectedProject.repo_link} target="_blank" rel="noopener noreferrer" style={styles.modalLink}>
+                      <a 
+                        href={selectedProject.repo_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={styles.modalLink}
+                        onMouseDown={handleButtonInteraction}
+                      >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '8px' }}>
                           <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -457,7 +557,13 @@ const ProjectsSection = () => {
                       </a>
                     ) : null}
                     {selectedProject.live_link ? (
-                      <a href={selectedProject.live_link} target="_blank" rel="noopener noreferrer" style={styles.modalLink}>
+                      <a 
+                        href={selectedProject.live_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={styles.modalLink}
+                        onMouseDown={handleButtonInteraction}
+                      >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ marginRight: '8px' }}>
                           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -517,6 +623,28 @@ const styles = {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
   },
+  autoSlideIndicator: {
+    position: 'absolute',
+    top: 10,
+    right: 15,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    fontSize: 11,
+    color: '#718096',
+    fontWeight: 500,
+    background: '#f8f9fa',
+    padding: '4px 10px',
+    borderRadius: 12,
+    border: '1px solid #e2e8f0',
+  },
+  autoSlideDot: {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    background: '#38a169',
+    animation: 'blinkPulse 1.5s infinite',
+  },
   categoryNav: {
     display: 'flex',
     justifyContent: 'center',
@@ -555,7 +683,6 @@ const styles = {
   },
   carouselContent: {
     flex: 1,
-    minHeight: '500px',
     position: 'relative',
     width: '100%',
   },
@@ -564,7 +691,6 @@ const styles = {
   },
   projectsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '24px',
     padding: '0 10px',
     justifyContent: 'center',
@@ -576,6 +702,9 @@ const styles = {
     border: '1px solid #e2e8f0',
     transition: 'all 0.3s ease',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+  },
+  allProjectsCard: {
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
   },
   imageContainer: {
     position: 'relative',
@@ -679,7 +808,6 @@ const styles = {
     cursor: 'pointer',
     fontWeight: 700,
     fontSize: '13px',
-    animation: 'blinkPulse 1.6s infinite, subtleGlow 2s infinite',
     transformOrigin: 'center',
     transition: 'all 0.3s ease',
     position: 'relative',

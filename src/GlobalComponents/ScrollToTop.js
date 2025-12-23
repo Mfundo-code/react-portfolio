@@ -14,7 +14,7 @@ const ScrollToTop = () => {
     });
   }, [pathname]); // This effect runs every time the pathname changes
 
-  return null; // This component doesn't render anything
+  return null; 
 };
 
 export default ScrollToTop;

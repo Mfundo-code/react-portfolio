@@ -7,7 +7,7 @@ export default function HeroSection({
   imageUrl = about,
   title = "Mfundo Dlamini",
   subtitle = "Full-Stack Developer | Building Modern Software Solutions I'm Available for Contracts and FullTime Positions",
-  primaryLabel = "View My Projects",
+  primaryLabel = "Contact Me!",
   onPrimary = () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }),
 }) {
   const containerRef = useRef(null);
